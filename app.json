@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "gcrown",
-    "slug": "gcrown",
+    "name": "Gcrown",
+    "slug": "Gcrown",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./src/image/LogoG.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -21,13 +21,17 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.roneyalmeida.gcrown"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "@react-native-community/datetimepicker"
-    ]
+    "plugins": ["@react-native-community/datetimepicker"],
+    "extra": {
+      "eas": {
+        "projectId": "1fc12bb7-adb5-4570-b908-1d583c4117e9"
+      }
+    }
   }
 }
