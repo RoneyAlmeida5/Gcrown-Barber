@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  TextInput,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import AddModal from "./src/modal/AddModal";
@@ -18,13 +19,10 @@ export default function App() {
   const [modalVisible, setModalVisible] = useState(false);
   const [agendamentos, setAgendamentos] = useState<any[]>([]);
   const [itemParaEditar, setItemParaEditar] = useState<any>(null);
+  const [busca, setBusca] = useState("");
+  const [mostrarSearch, setMostrarSearch] = useState(false);
   const [filtroAtivo, setFiltroAtivo] = useState("TODOS");
   const Logo = require("./src/image/LogoG.png");
-
-  // Função que recebe o novo item do Modal e adiciona na lista
-  const adicionarAgendamento = (novoItem: any) => {
-    setAgendamentos([novoItem, ...agendamentos]);
-  };
 
   const salvarAgendamento = (itemRecebido: any) => {
     const existe = agendamentos.find((a) => a.id === itemRecebido.id);
@@ -35,6 +33,7 @@ export default function App() {
       );
       setAgendamentos(listaAtualizada);
     } else {
+      // Adiciona ao final, pois o .sort() no render cuidará da posição correta
       setAgendamentos([...agendamentos, itemRecebido]);
     }
     setItemParaEditar(null);
@@ -111,28 +110,53 @@ export default function App() {
       />
 
       <View className="flex items-center justify-center mt-10">
-        <View className="flex-row items-center mb-3 p-3">
+        {/* Header com Busca e Logo */}
+        <View className="flex-row items-center mb-3 p-3 w-full justify-between">
           <TouchableOpacity
             onPress={() => setModalVisible(true)}
-            activeOpacity={0.7}
-            className="flex-row flex-none items-center bg-slate-900 px-6 py-4 rounded-2xl mt-8 shadow-lg shadow-blue-500/50"
+            className="flex-none items-center bg-slate-900 px-6 py-4 rounded-2xl shadow-lg shadow-blue-500/50"
           >
             <Ionicons name="add" size={24} color="white" />
           </TouchableOpacity>
-          <Image
-            source={Logo}
-            className="grow w-24 h-24"
-            resizeMode="contain"
-          />
-          <TouchableOpacity
-            activeOpacity={0.7}
-            className="flex-row flex-none items-center bg-slate-900 px-6 py-4 rounded-2xl mt-8 shadow-lg shadow-blue-500/50"
-          >
-            <Ionicons name="search" size={24} color="white" />
-          </TouchableOpacity>
+
+          {mostrarSearch ? (
+            <View className="grow flex-row items-center bg-slate-900 mx-2 px-4 h-14 rounded-2xl border border-blue-500/50">
+              <TextInput
+                autoFocus
+                value={busca}
+                onChangeText={setBusca}
+                placeholder="Buscar cliente..."
+                placeholderTextColor="#6b7280"
+                className="flex-1 text-white"
+              />
+              <TouchableOpacity
+                onPress={() => {
+                  setBusca("");
+                  setMostrarSearch(false);
+                }}
+              >
+                <Ionicons name="close-circle" size={20} color="gray" />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <Image
+              source={Logo}
+              className="grow w-24 h-24"
+              resizeMode="contain"
+            />
+          )}
+
+          {!mostrarSearch && (
+            <TouchableOpacity
+              onPress={() => setMostrarSearch(true)}
+              className="flex-none items-center bg-slate-900 px-6 py-4 rounded-2xl shadow-lg shadow-blue-500/50"
+            >
+              <Ionicons name="search" size={24} color="white" />
+            </TouchableOpacity>
+          )}
         </View>
 
-        {/* Menu de Filtros (Estático) */}
+        {/* Menu de Filtros */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -141,21 +165,21 @@ export default function App() {
           <View className="flex-row items-center px-4">
             <TouchableOpacity
               onPress={() => setFiltroAtivo("TODOS")}
-              className={`mr-1 h-[40px] px-6 rounded-full border justify-center ${filtroAtivo === "TODOS" ? "bg-blue-600 border-blue-400" : "bg-slate-900 border-gray-600"}`}
+              className={`mr-2 h-[40px] px-6 rounded-full border justify-center ${filtroAtivo === "TODOS" ? "bg-blue-600 border-blue-400" : "bg-slate-900 border-gray-600"}`}
             >
               <Text className="text-white text-sm font-bold">TODOS</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setFiltroAtivo("Confirmado")}
-              className={`mr-1 h-[40px] px-6 rounded-full border justify-center ${filtroAtivo === "Confirmado" ? "bg-green-600 border-green-400" : "bg-slate-900 border-gray-600"}`}
+              className={`mr-2 h-[40px] px-6 rounded-full border justify-center ${filtroAtivo === "Confirmado" ? "bg-green-600 border-green-400" : "bg-slate-900 border-gray-600"}`}
             >
               <Text className="text-white text-sm font-bold">CONFIRMADO</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={() => setFiltroAtivo("Aguardando")}
-              className={`mr-1 h-[40px] px-6 rounded-full border justify-center ${filtroAtivo === "Aguardando" ? "bg-yellow-600 border-yellow-400" : "bg-slate-900 border-gray-600"}`}
+              className={`mr-2 h-[40px] px-6 rounded-full border justify-center ${filtroAtivo === "Aguardando" ? "bg-yellow-600 border-yellow-400" : "bg-slate-900 border-gray-600"}`}
             >
               <Text className="text-white text-sm font-bold">
                 AGUARDANDO CONFIRMAÇÃO
@@ -164,20 +188,24 @@ export default function App() {
           </View>
         </ScrollView>
 
-        {/* Lista Dinâmica de Cards */}
+        {/* Lista de Cards */}
         <ScrollView
           className="w-full"
-          contentContainerStyle={{ alignItems: "center", paddingBottom: 100 }}
+          contentContainerStyle={{ alignItems: "center", paddingBottom: 200 }}
         >
           {agendamentos.length === 0 ? (
             <Text className="text-gray-500 mt-10">
-              Nenhum agendamento hoje.
+              Nenhum agendamento cadastrado.
             </Text>
           ) : (
             [...agendamentos]
               .filter((item) => {
-                if (filtroAtivo === "TODOS") return true;
-                return item.status === filtroAtivo;
+                const bateStatus =
+                  filtroAtivo === "TODOS" || item.status === filtroAtivo;
+                const bateBusca =
+                  item.cliente.toLowerCase().includes(busca.toLowerCase()) ||
+                  item.servico.toLowerCase().includes(busca.toLowerCase());
+                return bateStatus && bateBusca;
               })
               .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
               .map((item) => (

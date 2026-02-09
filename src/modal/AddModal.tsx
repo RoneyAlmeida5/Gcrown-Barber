@@ -308,7 +308,7 @@ export default function AddModal({
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={() => handleSave("Aguardando")}
+                onPress={() => handleSave("Aguardando Confirmação")}
                 className="flex-[1.5] bg-yellow-600 py-4 rounded-2xl items-center shadow-lg"
               >
                 <Text className="text-white font-bold text-[10px] uppercase text-center">
