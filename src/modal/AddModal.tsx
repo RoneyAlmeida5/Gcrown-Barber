@@ -77,6 +77,10 @@ export default function AddModal({
     }
   };
 
+  const dataFinal = new Date(date);
+  dataFinal.setHours(time.getHours(), time.getMinutes(), 0, 0);
+  const timestampCalculado = dataFinal.getTime();
+
   useEffect(() => {
     if (editingItem && visible) {
       setServico(editingItem.servico);
@@ -86,10 +90,13 @@ export default function AddModal({
       setMetodoPagamento(editingItem.metodoPagamento);
       setDateText(editingItem.data);
       setTimeText(editingItem.hora);
-      // Nota: Para data/hora exata no DateTimePicker, você precisaria salvar
-      // o objeto Date original no item, mas aqui usamos os textos para simplificar.
+      if (editingItem.timestamp) {
+        const dataOriginal = new Date(editingItem.timestamp);
+        setDate(dataOriginal);
+        setTime(dataOriginal);
+      }
     } else if (!visible) {
-      limparCampos(); // Limpa ao fechar
+      limparCampos();
     }
   }, [editingItem, visible]);
 
@@ -144,6 +151,7 @@ export default function AddModal({
       data: dateText,
       hora: timeText,
       status: status,
+      timestamp: timestampCalculado,
     });
 
     onClose();
