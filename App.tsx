@@ -178,8 +178,8 @@ export default function App() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => setFiltroAtivo("Aguardando")}
-              className={`mr-2 h-[40px] px-6 rounded-full border justify-center ${filtroAtivo === "Aguardando" ? "bg-yellow-600 border-yellow-400" : "bg-slate-900 border-gray-600"}`}
+              onPress={() => setFiltroAtivo("Aguardando Confirmação")}
+              className={`mr-2 h-[40px] px-6 rounded-full border justify-center ${filtroAtivo === "Aguardando Confirmação" ? "bg-yellow-600 border-yellow-400" : "bg-slate-900 border-gray-600"}`}
             >
               <Text className="text-white text-sm font-bold">
                 AGUARDANDO CONFIRMAÇÃO
