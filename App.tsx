@@ -29,14 +29,12 @@ export default function App() {
     const existe = agendamentos.find((a) => a.id === itemRecebido.id);
 
     if (existe) {
-      // Atualiza o existente
       const listaAtualizada = agendamentos.map((a) =>
         a.id === itemRecebido.id ? itemRecebido : a,
       );
       setAgendamentos(listaAtualizada);
     } else {
-      // Adiciona novo
-      setAgendamentos([itemRecebido, ...agendamentos]);
+      setAgendamentos([...agendamentos, itemRecebido]);
     }
     setItemParaEditar(null);
   };
@@ -161,116 +159,123 @@ export default function App() {
               Nenhum agendamento hoje.
             </Text>
           ) : (
-            agendamentos.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                activeOpacity={0.8}
-                onPress={() => abrirEdicao(item)}
-                className="bg-slate-900 w-[92%] p-5 rounded-3xl mb-4 border border-gray-600 shadow-xl"
-              >
-                <View className="flex-row justify-between items-start mb-4">
-                  <View className="flex-1">
-                    <View className="flex-row items-center">
-                      <MaterialCommunityIcons
-                        name="content-cut"
-                        size={15}
-                        color="#9ca3af"
-                      />
-                      <Text className="text-white text-xl font-bold ml-2">
-                        {item.servico}
-                      </Text>
-                    </View>
-                    <Text className="text-gray-400 text-sm">
-                      Cliente: {item.cliente}
-                    </Text>
-                  </View>
-
-                  {/* Lado Direito: Status e Botão Deletar */}
-                  <View className="items-end">
-                    <View className="flex-row items-center mb-2">
-                      <View
-                        className={
-                          item.status === "Confirmado"
-                            ? "bg-green-500/20 px-3 py-1 rounded-full"
-                            : "bg-yellow-500/20 px-3 py-1 rounded-full"
-                        }
-                      >
-                        <Text
-                          className={
-                            item.status === "Confirmado"
-                              ? "text-green-400 text-[10px] font-bold uppercase"
-                              : "text-yellow-400 text-[10px] font-bold uppercase"
-                          }
-                        >
-                          {item.status}
+            [...agendamentos]
+              .sort((a, b) => {
+                // Se um item não tiver timestamp (itens antigos), jogamos para o fim
+                const timeA = a.timestamp || 0;
+                const timeB = b.timestamp || 0;
+                return timeA - timeB;
+              })
+              .map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  activeOpacity={0.8}
+                  onPress={() => abrirEdicao(item)}
+                  className="bg-slate-900 w-[92%] p-5 rounded-3xl mb-4 border border-gray-600 shadow-xl"
+                >
+                  <View className="flex-row justify-between items-start mb-4">
+                    <View className="flex-1">
+                      <View className="flex-row items-center">
+                        <MaterialCommunityIcons
+                          name="content-cut"
+                          size={15}
+                          color="#9ca3af"
+                        />
+                        <Text className="text-white text-xl font-bold ml-2">
+                          {item.servico}
                         </Text>
                       </View>
+                      <Text className="text-gray-400 text-sm">
+                        Cliente: {item.cliente}
+                      </Text>
+                    </View>
 
-                      {/* Ícone de Deletar */}
-                      <TouchableOpacity
-                        onPress={() => deletarAgendamento(item.id)}
-                        className="ml-3 p-1"
-                      >
-                        <Ionicons
-                          name="trash-outline"
-                          size={20}
-                          color="#ef4444"
-                        />
-                      </TouchableOpacity>
+                    {/* Lado Direito: Status e Botão Deletar */}
+                    <View className="items-end">
+                      <View className="flex-row items-center mb-2">
+                        <View
+                          className={
+                            item.status === "Confirmado"
+                              ? "bg-green-500/20 px-3 py-1 rounded-full"
+                              : "bg-yellow-500/20 px-3 py-1 rounded-full"
+                          }
+                        >
+                          <Text
+                            className={
+                              item.status === "Confirmado"
+                                ? "text-green-400 text-[10px] font-bold uppercase"
+                                : "text-yellow-400 text-[10px] font-bold uppercase"
+                            }
+                          >
+                            {item.status}
+                          </Text>
+                        </View>
+
+                        {/* Ícone de Deletar */}
+                        <TouchableOpacity
+                          onPress={() => deletarAgendamento(item.id)}
+                          className="ml-3 p-1"
+                        >
+                          <Ionicons
+                            name="trash-outline"
+                            size={20}
+                            color="#ef4444"
+                          />
+                        </TouchableOpacity>
+                      </View>
                     </View>
                   </View>
-                </View>
 
-                <View className="h-[1px] bg-gray-600 w-full mb-4" />
+                  <View className="h-[1px] bg-gray-600 w-full mb-4" />
 
-                <View className="flex-row flex-wrap justify-between">
-                  <View className="flex-row items-center w-[48%] mb-3">
-                    <Ionicons
-                      name="calendar-outline"
-                      size={18}
-                      color="#9ca3af"
-                    />
-                    <Text className="text-gray-200 ml-2">
-                      {item.data} - {item.hora}
-                    </Text>
-                  </View>
-                  <View className="flex-row items-center w-[48%] mb-3">
-                    <MaterialCommunityIcons
-                      name="cash"
-                      size={18}
-                      color="#9ca3af"
-                    />
-                    <Text className="text-green-400 ml-2 font-semibold">
-                      R$ {item.valor}
-                    </Text>
-                    <Text className="text-blue-800 ml-2 font-semibold">
-                      ({item.metodoPagamento})
-                    </Text>
-                  </View>
-                  <View className="flex-row items-center w-full">
-                    <Ionicons
-                      name="location-outline"
-                      size={18}
-                      color="#9ca3af"
-                    />
-                    <Text className="text-gray-200 ml-2" numberOfLines={1}>
-                      {item.endereco}
-                    </Text>
-                  </View>
+                  <View className="flex-row flex-wrap justify-between">
+                    <View className="flex-row items-center w-[48%] mb-3">
+                      <Ionicons
+                        name="calendar-outline"
+                        size={18}
+                        color="#9ca3af"
+                      />
+                      <Text className="text-gray-200 ml-2">
+                        {item.data} - {item.hora}
+                      </Text>
+                    </View>
+                    <View className="flex-row items-center w-[48%] mb-3">
+                      <MaterialCommunityIcons
+                        name="cash"
+                        size={18}
+                        color="#9ca3af"
+                      />
+                      <Text className="text-green-400 ml-2 font-semibold">
+                        R$ {item.valor}
+                      </Text>
+                      <Text className="text-blue-800 ml-2 font-semibold">
+                        ({item.metodoPagamento})
+                      </Text>
+                    </View>
+                    <View className="flex-row items-center w-full">
+                      <Ionicons
+                        name="location-outline"
+                        size={18}
+                        color="#9ca3af"
+                      />
+                      <Text className="text-gray-200 ml-2" numberOfLines={1}>
+                        {item.endereco}
+                      </Text>
+                    </View>
 
-                  <View className="mt-4 bg-gray-800/50 p-2 rounded-lg flex-row items-center">
-                    <Ionicons
-                      name="notifications-outline"
-                      size={14}
-                      color="#60a5fa"
-                    />
-                    <Text className="text-blue-400 text-[10px] ml-2 font-medium">
-                      {item.lembrete}
-                    </Text>
+                    <View className="mt-4 bg-gray-800/50 p-2 rounded-lg flex-row items-center">
+                      <Ionicons
+                        name="notifications-outline"
+                        size={14}
+                        color="#60a5fa"
+                      />
+                      <Text className="text-blue-400 text-[10px] ml-2 font-medium">
+                        {item.lembrete}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            ))
+                </TouchableOpacity>
+              ))
           )}
         </ScrollView>
       </View>
