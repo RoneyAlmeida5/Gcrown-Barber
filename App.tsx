@@ -18,6 +18,7 @@ export default function App() {
   const [modalVisible, setModalVisible] = useState(false);
   const [agendamentos, setAgendamentos] = useState<any[]>([]);
   const [itemParaEditar, setItemParaEditar] = useState<any>(null);
+  const [filtroAtivo, setFiltroAtivo] = useState("TODOS");
   const Logo = require("./src/image/LogoG.png");
 
   // Função que recebe o novo item do Modal e adiciona na lista
@@ -138,12 +139,26 @@ export default function App() {
           className="py-2 h-20"
         >
           <View className="flex-row items-center px-4">
-            <TouchableOpacity className="mr-1 bg-slate-900 h-[40px] px-6 rounded-full border border-gray-600 justify-center">
+            <TouchableOpacity
+              onPress={() => setFiltroAtivo("TODOS")}
+              className={`mr-1 h-[40px] px-6 rounded-full border justify-center ${filtroAtivo === "TODOS" ? "bg-blue-600 border-blue-400" : "bg-slate-900 border-gray-600"}`}
+            >
               <Text className="text-white text-sm font-bold">TODOS</Text>
             </TouchableOpacity>
-            <TouchableOpacity className="mr-1 bg-slate-900 h-[40px] px-6 rounded-full border border-gray-600 justify-center">
-              <Text className="text-green-400 text-sm font-bold">
-                CONFIRMADO
+
+            <TouchableOpacity
+              onPress={() => setFiltroAtivo("Confirmado")}
+              className={`mr-1 h-[40px] px-6 rounded-full border justify-center ${filtroAtivo === "Confirmado" ? "bg-green-600 border-green-400" : "bg-slate-900 border-gray-600"}`}
+            >
+              <Text className="text-white text-sm font-bold">CONFIRMADO</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setFiltroAtivo("Aguardando")}
+              className={`mr-1 h-[40px] px-6 rounded-full border justify-center ${filtroAtivo === "Aguardando" ? "bg-yellow-600 border-yellow-400" : "bg-slate-900 border-gray-600"}`}
+            >
+              <Text className="text-white text-sm font-bold">
+                AGUARDANDO CONFIRMAÇÃO
               </Text>
             </TouchableOpacity>
           </View>
@@ -160,12 +175,11 @@ export default function App() {
             </Text>
           ) : (
             [...agendamentos]
-              .sort((a, b) => {
-                // Se um item não tiver timestamp (itens antigos), jogamos para o fim
-                const timeA = a.timestamp || 0;
-                const timeB = b.timestamp || 0;
-                return timeA - timeB;
+              .filter((item) => {
+                if (filtroAtivo === "TODOS") return true;
+                return item.status === filtroAtivo;
               })
+              .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
               .map((item) => (
                 <TouchableOpacity
                   key={item.id}
